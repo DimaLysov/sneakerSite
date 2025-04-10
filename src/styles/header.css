@@ -74,40 +74,7 @@ body {
     background-clip: text;
     color: transparent;
   }
-  
-  .nav {
-    display: flex;
-    gap: 2rem;
-  }
-  
-  .nav-link {
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    position: relative;
-    padding: 0.5rem 0;
-    transition: color 0.3s;
-  }
-  
-  .nav-link:hover {
-    color: #ff5a5f;
-  }
-  
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #ff5a5f;
-    transition: width 0.3s;
-  }
-  
-  .nav-link:hover::after {
-    width: 100%;
-  }
-  
+    
   .header-actions {
     display: flex;
     align-items: center;

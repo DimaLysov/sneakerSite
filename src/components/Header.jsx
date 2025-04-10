@@ -4,7 +4,6 @@ import Cart from './Cart';
 
 const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="header">
@@ -14,20 +13,6 @@ const Header = () => {
             <span className="logo-icon">👟</span>
             <span className="logo-text">SneakerShop</span>
           </Link>
-          
-          <button 
-            className="menu-toggle" 
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            <div className={`hamburger ${menuOpen ? 'open' : ''}`}></div>
-          </button>
-
-          <nav className={`nav ${menuOpen ? 'open' : ''}`}>
-            <Link to="/products" className="nav-link">Кроссовки</Link>
-            <Link to="/about" className="nav-link">О нас</Link>
-            <Link to="/contact" className="nav-link">Контакты</Link>
-          </nav>
           
           <div className="header-actions">
             <div 

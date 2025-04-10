@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  // const { id } = useParams();
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
@@ -18,17 +18,8 @@ const ProductDetail = () => {
       '/images/nike-air-max.jpg',
       '/images/nike-air-max.jpg'
     ],
-    description: 'Легендарные кроссовки с технологией Air для максимального комфорта.',
     sizes: [38, 39, 40, 41, 42, 43, 44],
     colors: ['black', 'white', 'red'],
-    features: [
-      'Амортизирующая подошва Air',
-      'Дышащий материал верха',
-      'Усиленная пятка',
-      'Резиновая подметка'
-    ],
-    rating: 4.8,
-    reviews: 124
   };
 
   return (
@@ -47,7 +38,6 @@ const ProductDetail = () => {
         </div>
         <div className="main-image">
           <img src={product.images[activeImage]} alt={product.name} />
-          <div className="product-badge">Хит продаж</div>
         </div>
       </div>
 
@@ -57,33 +47,10 @@ const ProductDetail = () => {
         </div>
 
         <h1 className="product-title">{product.name}</h1>
-        
-        <div className="product-meta">
-          <div className="brand-logo">
-            <img src={`/images/brands/${product.brand.toLowerCase()}-logo.png`} alt={product.brand} />
-          </div>
-          <div className="rating">
-            <div className="stars">
-              {'★'.repeat(Math.floor(product.rating))}
-              {'☆'.repeat(5 - Math.floor(product.rating))}
-            </div>
-            <span>{product.rating} ({product.reviews} отзывов)</span>
-          </div>
-        </div>
-
         <div className="price-section">
           <span className="current-price">{product.price.toLocaleString()} ₽</span>
-          <span className="old-price">14 999 ₽</span>
-          <span className="discount">-20%</span>
-        </div>
-
-        <div className="product-description">
-          <p>{product.description}</p>
-          <ul className="features-list">
-            {product.features.map((feature, index) => (
-              <li key={index}>{feature}</li>
-            ))}
-          </ul>
+          {/* <span className="old-price">14 999 ₽</span>
+          <span className="discount">-20%</span> */}
         </div>
 
         <div className="color-options">
@@ -133,11 +100,6 @@ const ProductDetail = () => {
         <div className="product-actions">
           <button className="add-to-cart-btn">
             Добавить в корзину — {(product.price * quantity).toLocaleString()} ₽
-          </button>
-          <button className="wishlist-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/>
-            </svg>
           </button>
         </div>
 
