@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-// import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useCart } from '../cartContext';
+
+import { fetchSkuByModelSneaker } from '../api/skus';
 
 const ProductDetail = () => {
-  // const { id } = useParams();
-  const [selectedSize, setSelectedSize] = useState(null);
+  const { id } = useParams();
+  // const [product, setProduct] = useState({});
+  const [sku, setProductDetails] = useState([{}]);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { addToCart } = useCart();
 
   // Моковые данные (замените на данные из API)
   const product = {
@@ -22,10 +30,68 @@ const ProductDetail = () => {
     colors: ['black', 'white', 'red'],
   };
 
+    // Запрос к API SKU модели
+    useEffect(() => {
+      const loadProductDetails = async () => {
+        try {
+          setIsLoading(true);
+          const data = await fetchSkuByModelSneaker(id);
+          console.log('Полученные данные SKU:', data);
+          setProductDetails(data)
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      loadProductDetails();
+    }, [id]);
+  
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      alert('Пожалуйста, выберите размер');
+      return;
+    }
+
+    // Находим объект из массива `sku`, соответствующий выбранному размеру
+    const selectedProduct = sku.find(product => product.size === selectedSize);
+
+    if (!selectedProduct) {
+      alert('Выбранный размер недоступен');
+      return;
+    }
+
+    // Добавляем товар в корзину с учётом размера и количества
+    addToCart({
+      id: selectedProduct.id,
+      name: selectedProduct.name,
+      brand: selectedProduct.brand,
+      size: selectedProduct.size,
+      price: selectedProduct.price,
+      quantity: quantity,
+      image_url: selectedProduct.image_url,
+    });
+
+    alert(`${selectedProduct.name} (${selectedProduct.size}) добавлен в корзину!`);
+  };
+
+  if (isLoading) {
+    return <div>Загрузка...</div>;
+  }
+  
+  if (error) {
+    return <div>Ошибка: {error}</div>;
+  }
+  
+  if (!product) {
+    return <div>Продукт не найден</div>;
+  }
+
   return (
     <div className="product-detail-page">
       <div className="product-gallery">
-        <div className="thumbnail-list">
+        {/* <div className="thumbnail-list">
           {product.images.map((img, index) => (
             <div 
               key={index}
@@ -35,52 +101,42 @@ const ProductDetail = () => {
               <img src={img} alt={`${product.name} ${index + 1}`} />
             </div>
           ))}
-        </div>
+        </div> */}
         <div className="main-image">
-          <img src={product.images[activeImage]} alt={product.name} />
+          {/* <img src={product.images[activeImage]} alt={product.name} /> */}
+          <img src={sku[0].image_url} alt={sku[0].name}/>
         </div>
       </div>
 
       <div className="product-info">
         <div className="breadcrumbs">
-          <span>Главная</span> / <span>Кроссовки</span> / <span>{product.brand}</span>
+          <span>Главная</span> / <span>Кроссовки</span> / <span>{sku[0].brand}</span>
         </div>
 
-        <h1 className="product-title">{product.name}</h1>
-        <div className="price-section">
-          <span className="current-price">{product.price.toLocaleString()} ₽</span>
-          {/* <span className="old-price">14 999 ₽</span>
-          <span className="discount">-20%</span> */}
-        </div>
-
-        <div className="color-options">
-          <h3>Цвет:</h3>
-          <div className="colors">
-            {product.colors.map((color, index) => (
-              <div 
-                key={index}
-                className="color-circle"
-                style={{ backgroundColor: color }}
-                title={color}
-              />
-            ))}
-          </div>
-        </div>
+        <h1 className="product-title">{sku[0].brand} {sku[0].name}</h1>
 
         <div className="size-selector">
           <h3>Размер:</h3>
           <div className="sizes">
-            {product.sizes.map(size => (
+            {sku.map(product => (
               <button
-                key={size}
-                className={`size-btn ${selectedSize === size ? 'selected' : ''}`}
-                onClick={() => setSelectedSize(size)}
+                key={product.size}
+                className={`size-btn ${selectedSize === product.size ? 'selected' : ''}`}
+                onClick={() => setSelectedSize(product.size)}
               >
-                {size}
+                {product.size}
               </button>
             ))}
           </div>
           <a href="#size-guide" className="size-guide-link">Таблица размеров</a>
+        </div>
+
+        <div className="price-section">
+          <span className="current-price">
+            {selectedSize
+              ? sku.find(product => product.size === selectedSize)?.price.toLocaleString() || '—'
+              : sku[0]?.price.toLocaleString()} ₽
+            </span>
         </div>
 
         <div className="quantity-selector">
@@ -98,8 +154,13 @@ const ProductDetail = () => {
         </div>
 
         <div className="product-actions">
-          <button className="add-to-cart-btn">
-            Добавить в корзину — {(product.price * quantity).toLocaleString()} ₽
+          <button 
+            className="add-to-cart-btn"
+            onClick={handleAddToCart}
+          >
+            Добавить в корзину — {selectedSize
+                                    ? (sku.find(product => product.size === selectedSize)?.price * quantity).toLocaleString() || '—'
+                                    : (sku[0]?.price * quantity).toLocaleString()} ₽
           </button>
         </div>
 
