@@ -6,29 +6,13 @@ import { fetchSkuByModelSneaker } from '../api/skus';
 
 const ProductDetail = () => {
   const { id } = useParams();
-  // const [product, setProduct] = useState({});
   const [sku, setProductDetails] = useState([{}]);
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(0);
+  // const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
-
-  // Моковые данные (замените на данные из API)
-  const product = {
-    id: 1,
-    name: 'Nike Air Max 95',
-    price: 12000,
-    brand: 'Nike',
-    images: [
-      '/images/nike-air-max.jpg',
-      '/images/nike-air-max.jpg',
-      '/images/nike-air-max.jpg'
-    ],
-    sizes: [38, 39, 40, 41, 42, 43, 44],
-    colors: ['black', 'white', 'red'],
-  };
 
     // Запрос к API SKU модели
     useEffect(() => {
@@ -36,7 +20,6 @@ const ProductDetail = () => {
         try {
           setIsLoading(true);
           const data = await fetchSkuByModelSneaker(id);
-          console.log('Полученные данные SKU:', data);
           setProductDetails(data)
         } catch (err) {
           setError(err.message);
@@ -61,17 +44,11 @@ const ProductDetail = () => {
       alert('Выбранный размер недоступен');
       return;
     }
+    addToCart(
+        selectedProduct,
+        quantity,
+      );
 
-    // Добавляем товар в корзину с учётом размера и количества
-    addToCart({
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      brand: selectedProduct.brand,
-      size: selectedProduct.size,
-      price: selectedProduct.price,
-      quantity: quantity,
-      image_url: selectedProduct.image_url,
-    });
 
     alert(`${selectedProduct.name} (${selectedProduct.size}) добавлен в корзину!`);
   };
@@ -84,7 +61,7 @@ const ProductDetail = () => {
     return <div>Ошибка: {error}</div>;
   }
   
-  if (!product) {
+  if (!sku || sku.length === 0) {
     return <div>Продукт не найден</div>;
   }
 

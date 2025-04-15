@@ -1,77 +1,84 @@
 import React, { createContext, useContext, useState } from 'react';
 
+import { AddCartItems, GetCartItems, RemoveCartItem, UpdateCartItem } from './api/cartitem';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const addToCart = (product, size = 'one-size', color = 'default') => {
+  // Получение корзины товаров с сервера
+  const fetchCartItems = async () => {
+    try {
+      setIsLoading(true);
+      const response = await GetCartItems();
+      return response;
+    } catch (error) {
+      console.error('Ошибка при получении корзины:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Добавление товара в корзину
+  const addToCart = async (product, quantity) => {
     if (!product || !product.id) return;
-
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(
-        item => item.id === product.id && item.size === size && item.color === color
-      );
-      
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id && item.size === size && item.color === color
-            ? { 
-                ...item, 
-                quantity: (item.quantity || 1) + 1 
-              }
-            : item
-        );
-      }
-      
-      return [...prevItems, { 
-        ...product,
-        size,
-        color,
-        quantity: 1,
-        price: product.price || 0
-      }];
-    });
+    try {
+      const requestBody = {
+        user: 1,
+        sku: product.id,
+        quantity: quantity,
+      };
+      setIsLoading(true);
+      const response = await AddCartItems(requestBody);
+      console.log('Товар успешно добавлен в корзину:', response);
+    } catch (error) {
+      console.error('Ошибка при добавлении товара в корзину:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const removeFromCart = (id, size = 'one-size', color = 'default') => {
-    setCartItems(prevItems => 
-      prevItems.filter(item => 
-        !(item.id === id && item.size === size && item.color === color)
-      )
-    );
+  // Удаление товара из корзины
+  const removeFromCart = async (id) => {
+    try {
+      setIsLoading(true);
+      await RemoveCartItem(id);
+      console.log(`Товар с ID ${id} успешно удалён из корзины`);
+    } catch (error) {
+      console.error('Ошибка при удалении товара из корзины:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const updateQuantity = (id, size = 'one-size', color = 'default', newQuantity) => {
-    if (newQuantity < 1) return;
-    
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id && item.size === size && item.color === color
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    );
+  // Обновление количества товара в корзине
+  const updateQuantity = async (id, newQuantity) => {
+    try {
+      const requestBody = {
+        quantity: newQuantity,
+      };
+      setIsLoading(true);
+      await UpdateCartItem(id, requestBody);
+      console.log(`Количество товара с ID ${id} успешно обновлено`);
+    } catch (error) {
+      console.error('Ошибка при обновлении количества товара в корзине:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 
-    0
-  );
-
-  const deliveryFee = totalPrice > 10000 ? 0 : 500;
-  const orderTotal = totalPrice + deliveryFee;
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
+        fetchCartItems,
         addToCart,
         removeFromCart,
         updateQuantity,
-        totalPrice,
-        deliveryFee,
-        orderTotal
       }}
     >
       {children}
