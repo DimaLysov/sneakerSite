@@ -1,7 +1,7 @@
-const BASE_URL = process.env.REACT_APP_PATH_URL_API;
+// const BASE_URL = process.env.REACT_APP_PATH_URL_API;
 
 export const AddCartItems = async (requestBody) => {
-  const response = await fetch(`${BASE_URL}/api/cart-items/`, {
+  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ export const AddCartItems = async (requestBody) => {
 
 export const GetCartItems = async () => {
   // Пока выводиться для первого пользователя
-  const response = await fetch(`${BASE_URL}/api/cart-items/by-user/1/`);
+  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/by-user/1/`);
   if (!response.ok) {
     throw new Error('Ошибка при загрузке данных продукта');
   }
@@ -26,7 +26,7 @@ export const GetCartItems = async () => {
 
 export const RemoveCartItem = async (id) => {
   console.log('Удаление товара с ID:', id);
-  const response = await fetch(`${BASE_URL}/api/cart-items/${id}/`, {
+  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/${id}/`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -35,7 +35,7 @@ export const RemoveCartItem = async (id) => {
 };
 
 export const UpdateCartItem = async (id, requestBody) => {
-  const response = await fetch(`${BASE_URL}/api/cart-items/${id}/update-quantity/`, {
+  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/${id}/update-quantity/`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
