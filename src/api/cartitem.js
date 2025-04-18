@@ -15,9 +15,9 @@ export const AddCartItems = async (requestBody) => {
 };
 
 
-export const GetCartItems = async () => {
+export const GetCartItems = async (id) => {
   // Пока выводиться для первого пользователя
-  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/by-user/1/`);
+  const response = await fetch(`http://127.0.0.1:8000/api/cart-items/by-user/${id}/`);
   if (!response.ok) {
     throw new Error('Ошибка при загрузке данных продукта');
   }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 
 import { AddCartItems, GetCartItems, RemoveCartItem, UpdateCartItem } from './api/cartitem';
+import { GetUserByTgId } from './api/user';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
@@ -8,10 +9,18 @@ export const CartProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Получение корзины товаров с сервера
+  // const user = window.Telegram.WebApp.initDataUnsafe.user;
   const fetchCartItems = async () => {
     try {
       setIsLoading(true);
-      const response = await GetCartItems();
+
+      const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+
+      if (!user_tg_id) {
+        throw new Error('Telegram ID пользователя не найден');
+      }
+      const user = await GetUserByTgId(user_tg_id);
+      const response = await GetCartItems(user.id);
       return response;
     } catch (error) {
       console.error('Ошибка при получении корзины:', error);
@@ -25,8 +34,16 @@ export const CartProvider = ({ children }) => {
   const addToCart = async (product, quantity) => {
     if (!product || !product.id) return;
     try {
+      const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+
+      if (!user_tg_id) {
+        throw new Error('Telegram ID пользователя не найден');
+      }
+      const user = await GetUserByTgId(user_tg_id);
+      console.log('user:', user);
+
       const requestBody = {
-        user: 1,
+        user: user.id,
         sku: product.id,
         quantity: quantity,
       };
