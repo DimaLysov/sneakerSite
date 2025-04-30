@@ -8,9 +8,11 @@ import Checkout from './pages/Checkout';
 import './styles/footerFilters.css';
 import './styles/cart.css';
 import './styles/header.css';
+import './styles/componentCSS.css';
+import './styles/displayProduct.css';
 import { CartProvider } from './cartContext';
 
-import { AddUser, GetUserByTgId } from './api/user';
+import { AddUser } from './api/user';
 
 
 
@@ -20,7 +22,15 @@ function App() {
     const addUserToBackend = async () => {
       if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-
+        // console.log("Telegram WebApp доступен:", tg);
+        // if (tg) {
+        //   console.log("Telegram WebApp weedwedwed:",  tg.colorScheme);
+        //   // const theme = tg.themeParams?.theme || 'light';
+        //   const theme = tg.colorScheme
+        //   document.documentElement.setAttribute('data-theme', theme);
+        //   console.log("Telegram WebApp Theme:", theme);
+        // }
+        
         // Инициализация (можно раскрыть интерфейс)
         tg.expand();
 
@@ -35,11 +45,11 @@ function App() {
 
           try {
             // Проверяем, существует ли пользователь
-            const existingUser = await GetUserByTgId(tg_id);
-            if (existingUser) {
-              console.log("Пользователь уже существует:", existingUser);
-              return; 
-            }
+            // const existingUser = await GetUserByTgId(tg_id);
+            // if (existingUser) {
+            //   console.log("Пользователь уже существует:", existingUser);
+            //   return; 
+            // }
 
             // Если пользователь не существует, добавляем его
             const userData = {
