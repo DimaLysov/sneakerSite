@@ -10,6 +10,7 @@ const ProductCard = ({ product }) => {
           <img
             src={product.image_url}
             alt={product.name}
+            loading="lazy"
             className="product-image"
             onError={(e) => {
               e.target.onerror = null;
