@@ -1,92 +1,61 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
 
 import { AddCartItems, GetCartItems, RemoveCartItem, UpdateCartItem } from './api/cartitem';
 import { GetUserByTgId } from './api/user';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // Получение корзины товаров с сервера
   // const user = window.Telegram.WebApp.initDataUnsafe.user;
-  const fetchCartItems = async () => {
-    try {
-      setIsLoading(true);
-
-      const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
-
+  const fetchCartItems = useCallback(async () => {
+    const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+  
       if (!user_tg_id) {
         throw new Error('Telegram ID пользователя не найден');
       }
       const user = await GetUserByTgId(user_tg_id);
       const response = await GetCartItems(user.id);
       return response;
-    } catch (error) {
-      console.error('Ошибка при получении корзины:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, []);
 
   // Добавление товара в корзину
   const addToCart = async (product, quantity) => {
     if (!product || !product.id) return;
-    try {
-      const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+    const user_tg_id = window.Telegram.WebApp.initDataUnsafe?.user?.id;
 
-      if (!user_tg_id) {
-        throw new Error('Telegram ID пользователя не найден');
-      }
-      const user = await GetUserByTgId(user_tg_id);
-      console.log('user:', user);
-
-      const requestBody = {
-        user: user.id,
-        sku: product.id,
-        quantity: quantity,
-      };
-      setIsLoading(true);
-      const response = await AddCartItems(requestBody);
-      console.log('Товар успешно добавлен в корзину:', response);
-    } catch (error) {
-      console.error('Ошибка при добавлении товара в корзину:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
+    if (!user_tg_id) {
+      throw new Error('Telegram ID пользователя не найден');
     }
+    const user = await GetUserByTgId(user_tg_id);
+    const cart_items = await GetCartItems(user.id);
+    if (cart_items.some((item) => item.sku === product.id)) {
+      const existingItem = cart_items.find((item) => item.sku === product.id);
+      updateQuantity(existingItem.id, quantity+existingItem.quantity);
+      return;
+    }
+    const requestBody = {
+      user: user.id,
+      sku: product.id,
+      quantity: quantity,
+    };
+    const response = await AddCartItems(requestBody);
+    console.log('Товар успешно добавлен в корзину:', response);
   };
 
   // Удаление товара из корзины
   const removeFromCart = async (id) => {
-    try {
-      setIsLoading(true);
-      await RemoveCartItem(id);
-      console.log(`Товар с ID ${id} успешно удалён из корзины`);
-    } catch (error) {
-      console.error('Ошибка при удалении товара из корзины:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    await RemoveCartItem(id);
+    console.log(`Товар с ID ${id} успешно удалён из корзины`);
   };
 
   // Обновление количества товара в корзине
   const updateQuantity = async (id, newQuantity) => {
-    try {
-      const requestBody = {
-        quantity: newQuantity,
-      };
-      setIsLoading(true);
-      await UpdateCartItem(id, requestBody);
-      console.log(`Количество товара с ID ${id} успешно обновлено`);
-    } catch (error) {
-      console.error('Ошибка при обновлении количества товара в корзине:', error);
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
+    const requestBody = {
+      quantity: newQuantity,
+    };
+    await UpdateCartItem(id, requestBody);
+    console.log(`Количество товара с ID ${id} успешно обновлено`);
   };
 
   return (

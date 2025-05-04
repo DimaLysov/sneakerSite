@@ -2,14 +2,18 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
+
 import './styles/footerFilters.css';
 import './styles/cart.css';
+import './styles/checkout.css';
 import './styles/header.css';
 import './styles/componentCSS.css';
-import './styles/displayProduct.css';
+import './styles/productCard.css';
+import './styles/home.css';
 import { CartProvider } from './cartContext';
 
 import { AddUser } from './api/user';
@@ -22,45 +26,27 @@ function App() {
     const addUserToBackend = async () => {
       if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-        // console.log("Telegram WebApp доступен:", tg);
-        // if (tg) {
-        //   console.log("Telegram WebApp weedwedwed:",  tg.colorScheme);
-        //   // const theme = tg.themeParams?.theme || 'light';
-        //   const theme = tg.colorScheme
-        //   document.documentElement.setAttribute('data-theme', theme);
-        //   console.log("Telegram WebApp Theme:", theme);
-        // }
-        
-        // Инициализация (можно раскрыть интерфейс)
         tg.expand();
 
-        // Получаем данные пользователя
         const user = tg.initDataUnsafe?.user;
         console.log("Telegram User:", user);
 
-        // Если пользователь существует, отправляем данные на API
         if (user) {
           const tg_id = user.id;
           const tg_username = user.username;
 
           try {
-            // Проверяем, существует ли пользователь
-            // const existingUser = await GetUserByTgId(tg_id);
-            // if (existingUser) {
-            //   console.log("Пользователь уже существует:", existingUser);
-            //   return; 
-            // }
-
-            // Если пользователь не существует, добавляем его
             const userData = {
               tg_id: tg_id,
               tg_username: tg_username,
             };
-
             console.log("Отправка данных пользователя:", userData);
-
             const response = await AddUser(userData);
-            console.log("Пользователь успешно добавлен:", response);
+            if (response.exists) {
+              console.log("Пользователь уже существует в базе данных.");
+            } else {
+              console.log("Пользователь успешно добавлен:", response);
+            }
           } catch (error) {
             console.error("Ошибка при обработке пользователя:", error);
           }

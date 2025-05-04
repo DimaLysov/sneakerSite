@@ -6,6 +6,11 @@ export const AddUser = async (requestBody) => {
       },
       body: JSON.stringify(requestBody),
     });
+
+    if (response.status === 400) {
+      return { exists: true };
+    }
+
     if (!response.ok) {
       throw new Error(`Ошибка при добавлении пользователя: ${response.statusText}`);
   }

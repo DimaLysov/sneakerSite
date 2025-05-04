@@ -4,7 +4,8 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="product-card">
-      <div className="card-badge">Новинка</div>
+      {/* <div className="card-badge">Новинка</div> */}
+      <div className="card-badge">{product.brand} {product.name}</div>
       <Link to={`/products/${product.id}`} className="product-link">
         <div className="product-image-container">
           <img
@@ -20,9 +21,9 @@ const ProductCard = ({ product }) => {
         </div>
       </Link>
 
-      <div className="product-info">
+      {/* <div className="name-product">
         <h3>{product.brand} {product.name}</h3>
-      </div>
+      </div> */}
     </div>
   );
 };

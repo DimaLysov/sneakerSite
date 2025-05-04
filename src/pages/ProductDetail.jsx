@@ -105,7 +105,6 @@ const ProductDetail = () => {
               </button>
             ))}
           </div>
-          <a href="#size-guide" className="size-guide-link">Таблица размеров</a>
         </div>
 
         <div className="price-section">
